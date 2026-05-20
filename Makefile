@@ -18,4 +18,10 @@ $(TARGET): $(OBJS)
 clean:
 	rm -f $(OBJS) $(TARGET)
 
-.PHONY: all clean
+install:	$(TARGET)
+	sudo	cp	$(TARGET)	/usr/local/bin/tuff
+
+uninstall:
+	sudo	rm	-f	/usr/local/bin/tuff
+
+.PHONY: all	clean	install	uninstall

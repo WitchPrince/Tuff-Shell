@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 int cd(char **args){
 	if(args[1] == NULL){
@@ -9,7 +10,18 @@ int cd(char **args){
 	}
 
 	else{
-		if(chdir(args[1]) != 0){
+		char path[1024];
+		
+		if(args[1][0] == '~'){
+			char *home = getenv("HOME");
+			snprintf(path, sizeof(path), "%s%s", home, args[1] + 1);
+		}
+
+		else{
+			strncpy(path, args[1], sizeof(path));
+		}
+
+		if(chdir(path) != 0){
 			perror("tuffshell");
 		}
 	}
