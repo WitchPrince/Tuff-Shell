@@ -1,6 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -g
 LDFLAGS	=	-lreadline	-lhistory
+CONFIG	=	tuffshell
 
 TARGET = tuffshell
 
@@ -21,6 +22,9 @@ clean:
 
 install:	$(TARGET)
 	sudo	cp	$(TARGET)	/usr/local/bin/tuff
+	mkdir -p	~/.config/tuffshell/functions
+	touch	~/.config/tuffshell/functions/tuff-config.tuff
+	touch	~/.config/tuffshell/tuff-conf
 
 uninstall:
 	sudo	rm	-f	/usr/local/bin/tuff
