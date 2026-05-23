@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 #include "src/parser.h"
 #include "src/executor.h"
 
@@ -37,31 +39,30 @@ void load_config(){
 
 void shell_loop() {
 	char *line = NULL;
-	size_t len = 0;
-	ssize_t read;
 	char **args;
-	int status;
 
 	do{
 		args = parse_line("pwd");
 		launch(args);
-		printf("tuffshell> ");
-		read = getline(&line, &len, stdin);
 
-		if(read == -1) {
+		line = readline("tuffshell> ");
+
+		if(line == NULL){
 			printf("\n");
 			break;
 		}
 
-		args = parse_line(line);
-		status = launch(args);
+		if(line[0] != '\0'){
+			add_history(line);
+		}
 
-		printf("\n");
+		args = parse_line(line);
+		launch(args);
 
 		free(args);
-	} while(status);
-
-	free(line);
+		free(line);
+	
+	} while(1);
 }
 
 int main() {
