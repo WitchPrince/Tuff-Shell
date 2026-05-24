@@ -49,6 +49,18 @@ int launch(char **args){
 		return 1;
 	}
 
+	//color activate for ls command, wasn't necessary but sometimes I'm forgetting what I saw is a file or a directory lol
+	if(strcmp(args[0], "ls") == 0){
+		int i = 0;
+
+		while(args[i] != NULL){
+			i++;
+		}
+
+		args[i] = "--color=auto";
+		args[i+1] = NULL;
+	}
+
 	builtin_status = execute_builtin(args);
 	if(builtin_status != -1){
 		return builtin_status;

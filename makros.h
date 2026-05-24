@@ -1,0 +1,7 @@
+#define PROMPT_COLOR_CYAN "\x01\033[1;36m\x02"
+#define PROMPT_COLOR_GREEN "\x01\033[1;32m\x02"
+#define PROMPT_COLOR_BLUE "\x01\033[1;34m\x02"
+#define PROMPT_COLOR_RESET "\x01\033[0m\x02"
+
+#define ANSI_COLOR_RED "\033[1;31m"
+#define ANSI_COLOR_RESET "\033[0m"

@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include "makros.h"
 #include "src/parser.h"
 #include "src/executor.h"
 
@@ -40,12 +42,18 @@ void load_config(){
 void shell_loop() {
 	char *line = NULL;
 	char **args;
+	char cwd[1024];
+	char prompt[2048];
 
 	do{
-		args = parse_line("pwd");
-		launch(args);
+		if(getcwd(cwd, sizeof(cwd)) != NULL){
+			snprintf(prompt, sizeof(prompt), "%s%s\n%stuffshell> %s", PROMPT_COLOR_CYAN, cwd, PROMPT_COLOR_GREEN, PROMPT_COLOR_RESET);
+		}
+		else{
+			snprintf(prompt, sizeof(prompt), "%stuffshell> %s", PROMPT_COLOR_GREEN, PROMPT_COLOR_RESET);
+		}
 
-		line = readline("tuffshell> ");
+		line = readline(prompt);
 
 		if(line == NULL){
 			printf("\n");
