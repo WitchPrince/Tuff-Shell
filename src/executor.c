@@ -57,8 +57,9 @@ int launch(char **args){
 			i++;
 		}
 
-		args[i] = "--color=auto";
-		args[i+1] = NULL;
+		args[i] = "-l";
+		args[i+1] = "--color=auto";
+		args[i+2] = NULL;
 	}
 
 	builtin_status = execute_builtin(args);
@@ -95,6 +96,9 @@ int launch(char **args){
 		pid1 = fork();
 
 		if(pid1 == 0){
+			signal(SIGINT, SIG_DFL);
+			signal(SIGTSTP, SIG_DFL);
+
 			close(pipefd[0]);
 			dup2(pipefd[1], STDOUT_FILENO);
 			close(pipefd[1]);
@@ -107,6 +111,9 @@ int launch(char **args){
 
 		pid2 = fork();
 		if(pid2 == 0){
+			signal(SIGINT, SIG_DFL);
+			signal(SIGTSTP, SIG_DFL);
+
 			close(pipefd[1]);
 			dup2(pipefd[0], STDIN_FILENO);
 			close(pipefd[0]);
@@ -129,6 +136,9 @@ int launch(char **args){
 	pid = fork();
 
 	if(pid == 0){
+		signal(SIGINT, SIG_DFL);
+		signal(SIGTSTP, SIG_DFL);
+
 		if(execvp(args[0], args) == -1){
 			perror("tuffshell");
 		}	

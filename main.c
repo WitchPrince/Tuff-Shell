@@ -2,23 +2,40 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "makros.h"
 #include "src/parser.h"
 #include "src/executor.h"
 
-void load_config(){
+void sigint_handler(int sig){
+	(void)sig;
+	printf("\n");
+
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
+}
+
+void load_start(){
 	char *home = getenv("HOME");
 	if(home == NULL){
 		return;
 	}
 	
 	char config_path[1024];
-	snprintf(config_path, sizeof(config_path), "%s/.config/tuffshell/tuff-conf", home);
+	snprintf(config_path, sizeof(config_path), "%s/.config/tuffshell/tuff-start", home);
 
 	FILE *file = fopen(config_path, "r");
 	if(file == NULL){
+		file = fopen(config_path, "w");
+		if(file == NULL){
+			fprintf(stderr, "Start file isn't exit and we couldn't create a new one.");
+			return;
+		}
+
+		printf("File couln't found, so we created a new fresh one! You can directly type 'tuff-config' for go to file directory.");
 		return;
 	}
 
@@ -75,7 +92,11 @@ void shell_loop() {
 }
 
 int main() {
-	load_config();
+
+	signal(SIGINT, sigint_handler);
+	signal(SIGTSTP, SIG_IGN);
+
+	load_start();
 	shell_loop();
 	return EXIT_SUCCESS;
 }

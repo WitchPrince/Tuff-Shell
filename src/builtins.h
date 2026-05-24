@@ -3,6 +3,7 @@
 
 int cd(char **args);
 int shell_exit(char **args);
+int shell_export(char **args);
 int execute_builtin(char **args);
 
 #endif

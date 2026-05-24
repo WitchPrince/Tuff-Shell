@@ -20,6 +20,18 @@ char **parse_line(char *line) {
 	token = strtok(line, TOKEN_DELIMETERS);
 
 	while(token != NULL){
+
+		if(token[0] == '$'){
+			char *env_value = getenv(token+1);
+
+			if(env_value != NULL){
+				token = env_value;
+			}
+			else{
+				token = "";
+			}
+		}
+
 		tokens[position] = token;
 		position++;
 
