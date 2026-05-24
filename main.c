@@ -58,6 +58,7 @@ void shell_loop() {
 
 		args = parse_line(line);
 		launch(args);
+		printf("\n");
 
 		free(args);
 		free(line);
