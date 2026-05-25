@@ -135,6 +135,18 @@ int launch(char **args){
 		return 1;
 	}
 
+	int is_background = 0;
+	int arg_count = 0;
+
+	while(args[arg_count] != NULL){
+		arg_count++;
+	}
+
+	if(arg_count > 0 && strcmp(args[arg_count - 1], "&") == 0){
+		is_background = 1;
+		args[arg_count - 1] = NULL;
+	}
+
 	pid = fork();
 
 	if(pid == 0){
@@ -202,9 +214,15 @@ int launch(char **args){
 	}
 
 	else{
-		do{
-			wpid = waitpid(pid, &status, WUNTRACED);
-		} while(!WIFEXITED(status) && !WIFSIGNALED(status));
+		if(!is_background){
+			do{
+				wpid = waitpid(pid, &status, WUNTRACED);
+			}while(!WIFEXITED(status) && !WIFSIGNALED(status));
+		}
+
+		else{
+			printf("Background Job started, PID: %d\n", pid);
+		}
 	}
 
 	return 1;

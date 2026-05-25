@@ -5,9 +5,31 @@
 #include <signal.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include "makros.h"
 #include "src/parser.h"
 #include "src/executor.h"
+
+void print_logo(){
+	printf("%s"
+	" ________  __    __  ________  ________   ______   __    __  ________  __        __       \n"
+	"|        \\|  \\  |  \\|        \\|        \\ /      \\ |  \\  |  \\|        \\|  \\      |  \\      \n"
+	" \\$$$$$$$$| $$  | $$| $$$$$$$$| $$$$$$$$|  $$$$$$\\| $$  | $$| $$$$$$$$| $$      | $$      \n"
+	"   | $$   | $$  | $$| $$__    | $$__    | $$___\\$$| $$__| $$| $$__    | $$      | $$      \n"
+	"   | $$   | $$  | $$| $$  \\   | $$  \\    \\$$    \\ | $$    $$| $$  \\   | $$      | $$      \n"
+	"   | $$   | $$  | $$| $$$$$   | $$$$$    _\\$$$$$$\\| $$$$$$$$| $$$$$   | $$      | $$      \n"
+	"   | $$   | $$__/ $$| $$      | $$      |  \\__| $$| $$  | $$| $$_____ | $$_____ | $$_____ \n"
+	"   | $$    \\$$    $$| $$      | $$       \\$$    $$| $$  | $$| $$     \\| $$     \\| $$     \\\n"
+	"    \\$$     \\$$$$$$  \\$$       \\$$        \\$$$$$$  \\$$   \\$$ \\$$$$$$$$ \\$$$$$$$$ \\$$$$$$$$\n\n"
+	"%s", PROMPT_COLOR_CYAN, PROMPT_COLOR_RESET);
+}
+
+void sigchld_handler(int sig){
+	(void)sig;
+
+	while(waitpid(-1, NULL, WNOHANG) > 0);
+}
 
 void sigint_handler(int sig){
 	(void)sig;
@@ -95,6 +117,10 @@ int main() {
 
 	signal(SIGINT, sigint_handler);
 	signal(SIGTSTP, SIG_IGN);
+
+	signal(SIGCHLD, sigchld_handler);
+
+	print_logo();
 
 	load_start();
 	shell_loop();
