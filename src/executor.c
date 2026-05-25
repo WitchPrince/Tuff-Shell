@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <string.h>
+#include <fcntl.h>
 #include "executor.h"
 #include "builtins.h"
 #include "parser.h"
@@ -99,6 +100,7 @@ int launch(char **args){
 			signal(SIGINT, SIG_DFL);
 			signal(SIGTSTP, SIG_DFL);
 
+			
 			close(pipefd[0]);
 			dup2(pipefd[1], STDOUT_FILENO);
 			close(pipefd[1]);
@@ -138,12 +140,61 @@ int launch(char **args){
 	if(pid == 0){
 		signal(SIGINT, SIG_DFL);
 		signal(SIGTSTP, SIG_DFL);
+			
+		int i = 0;
+		int target_null = -1;
+
+		while(args[i] != NULL){
+			if(strcmp(args[i], ">") == 0){
+				int out_fd = open(args[i+1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+				
+				if(out_fd < 0){
+					perror("tuffshell file open error");
+					exit(EXIT_FAILURE);
+				}
+
+				dup2(out_fd, STDOUT_FILENO);
+				close(out_fd);
+				target_null = i;
+			}
+
+			else if(strcmp(args[i], ">>") == 0){
+				int out_fd = open(args[i+1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+				
+				if(out_fd < 0){
+					perror("tuffshell file open error");
+					exit(EXIT_FAILURE);
+				}
+
+				dup2(out_fd, STDOUT_FILENO);
+				close(out_fd);
+				target_null = i;
+			}
+
+			else if(strcmp(args[i], "<") == 0){
+				int in_fd = open(args[i+1], O_RDONLY);
+				
+				if(in_fd < 0){
+					perror("tuffshell file read error");
+					exit(EXIT_FAILURE);
+				}
+
+				dup2(in_fd, STDIN_FILENO);
+				close(in_fd);
+				target_null = i;
+			}
+
+			i++;
+		}
+
+		if(target_null != -1){
+			args[target_null] = NULL;
+		}
 
 		if(execvp(args[0], args) == -1){
 			perror("tuffshell");
+			exit(EXIT_FAILURE);
 		}	
-
-		exit(EXIT_FAILURE);
 	}
 
 	else if(pid < 0){
