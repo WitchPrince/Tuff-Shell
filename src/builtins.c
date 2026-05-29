@@ -43,17 +43,31 @@ int cd(char **args){
 	}
 
 	else{
-		if(args[1][0] == '~'){
-			snprintf(path, sizeof(path), "%s%s", home, args[1] + 1);
+		char raw_path[1024];
+		raw_path[0] = '\0';
+
+		int i = 1;
+
+		while(args[i] != NULL){
+			strcat(raw_path, args[i]);
+			
+			if(args[i+1] != NULL){
+				strcat(raw_path, " ");
+			}	
+			i++;
 		}
 
+		if(raw_path[0] == '~'){
+			snprintf(path, sizeof(path), "%s%s", home, raw_path + 1);
+		}
 		else{
-			strncpy(path, args[1], sizeof(path));
+			snprintf(path, sizeof(path), raw_path);
 		}
 
 		if(chdir(path) != 0){
 			perror("tuffshell");
 		}
+
 	}
 
 	return 1;

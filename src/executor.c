@@ -150,6 +150,11 @@ int launch(char **args){
 	pid = fork();
 
 	if(pid == 0){
+
+		if(is_background){
+			setsid();
+		}
+
 		signal(SIGINT, SIG_DFL);
 		signal(SIGTSTP, SIG_DFL);
 			

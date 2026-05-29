@@ -21,6 +21,7 @@ clean:
 	rm -f $(OBJS) $(TARGET)
 
 install:	$(TARGET)
+	sudo	rm	-f	/usr/local/bin/tuff
 	sudo	cp	$(TARGET)	/usr/local/bin/tuff
 	mkdir -p	~/.config/tuffshell/functions
 	touch	~/.config/tuffshell/functions/tuff-config.tuff
