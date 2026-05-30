@@ -49,8 +49,17 @@ int cd(char **args){
 		int i = 1;
 
 		while(args[i] != NULL){
-			strcat(raw_path, args[i]);
-			
+			int j = 0;	
+
+			while(args[i][j] != '\0'){
+				if(args[i][j] != '\\'){
+					int len = strlen(raw_path);
+					raw_path[len] = args[i][j];
+					raw_path[len+1] = '\0';
+				}
+				j++;
+			}
+
 			if(args[i+1] != NULL){
 				strcat(raw_path, " ");
 			}	
