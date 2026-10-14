@@ -84,6 +84,8 @@ void shell_loop() {
 	char cwd[1024];
 	char prompt[2048];
 
+	int launch_status = 0;
+
 	do{
 		if(getcwd(cwd, sizeof(cwd)) != NULL){
 			snprintf(prompt, sizeof(prompt), "%s%s\n%stuffshell> %s", PROMPT_COLOR_CYAN, cwd, PROMPT_COLOR_GREEN, PROMPT_COLOR_RESET);
@@ -104,12 +106,15 @@ void shell_loop() {
 		}
 
 		args = parse_line(line);
-		launch(args);
+		launch_status = launch(args);
 		printf("\n");
 
 		free(args);
 		free(line);
 	
+		if(launch_status == 0){
+			break;
+		}
 	} while(1);
 }
 
