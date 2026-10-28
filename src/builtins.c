@@ -91,10 +91,18 @@ int shell_function(char **args){
 	char *home = getenv("HOME");
 	char func_path[1024];
 
+	if(args[1] == NULL){
+		//printf("Error! Syntax: function <func_name> <commands>");
+		return -1;
+	}
+
 	if(strcmp(args[1], "list") == 0){
 		snprintf(func_path, sizeof(func_path), "ls %s/.config/tuffshell/functions", home);
 		char **args2 = parse_line(func_path);
-		launch(args2);
+		if(args2 != NULL){
+			launch(args2);
+			free(args2);
+		}
 		return 1;
 	}
 
@@ -107,6 +115,7 @@ int shell_function(char **args){
 		}
 
 		remove(func_path);
+		fclose(func);
 		printf("Function successfully deleted!");
 	}
 
@@ -116,6 +125,7 @@ int shell_function(char **args){
 
 		if(func != NULL){
 			fprintf(stderr, "A function named '%s' already exist!", args[1]);
+			fclose(func);
 			return -1;
 		}
 

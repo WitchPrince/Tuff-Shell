@@ -44,7 +44,13 @@ char **parse_line(char *line) {
 
 			if(position >= bufsize){
 				bufsize += TOKEN_BUFSIZE;
-				tokens = realloc(tokens, bufsize * sizeof(char*));
+				char **tmp = realloc(tokens, bufsize * sizeof(char*));
+				if(tmp == NULL){
+					free(tokens);
+					fprintf(stderr, "Tuffshell: memory allocating error!");
+					return NULL;
+				}
+				tokens = tmp;
 			}
 
 			token_start = NULL;

@@ -51,7 +51,7 @@ int launch(char **args){
 	}
 
 	//color activate for ls command, wasn't necessary but sometimes I'm forgetting what I saw is a file or a directory lol
-	if(strcmp(args[0], "ls") == 0){
+	/*if(strcmp(args[0], "ls") == 0){
 		int i = 0;
 
 		while(args[i] != NULL){
@@ -61,7 +61,7 @@ int launch(char **args){
 		args[i] = "-l";
 		args[i+1] = "--color=auto";
 		args[i+2] = NULL;
-	}
+	}*/
 
 	builtin_status = execute_builtin(args);
 	if(builtin_status != -1){
@@ -81,58 +81,58 @@ int launch(char **args){
 			break;
 		}
 		i++;
-	}
+	
+		if(pipe_index != -1){
+			args[pipe_index] = NULL;
+			char **args2 = &args[pipe_index + 1];
 
-	if(pipe_index != -1){
-		args[pipe_index] = NULL;
-		char **args2 = &args[pipe_index + 1];
+			int pipefd[2];
+			if(pipe(pipefd) == -1){
+				perror("tuffshell pipe hatasi");
+				return 1;
+			}
 
-		int pipefd[2];
-		if(pipe(pipefd) == -1){
-			perror("tuffshell pipe hatasi");
+			pid_t pid1, pid2;
+			pid1 = fork();
+
+			if(pid1 == 0){
+				signal(SIGINT, SIG_DFL);
+				signal(SIGTSTP, SIG_DFL);
+
+				close(pipefd[0]);
+				dup2(pipefd[1], STDOUT_FILENO);
+				close(pipefd[1]);
+
+				if(execvp(args[0], args) == -1){
+					perror("tuffshell command 1");
+					exit(EXIT_FAILURE);
+				}
+			}
+
+			pid2 = fork();
+			if(pid2 == 0){
+				signal(SIGINT, SIG_DFL);
+				signal(SIGTSTP, SIG_DFL);
+
+				close(pipefd[1]);
+				dup2(pipefd[0], STDIN_FILENO);
+				close(pipefd[0]);
+
+				if(execvp(args2[0], args2) == -1){
+					perror("tuffshell komut 2");
+					exit(EXIT_FAILURE);
+				}
+			}
+
+			close(pipefd[0]);
+			close(pipefd[1]);
+
+			waitpid(pid1, NULL, 0);
+			waitpid(pid2, NULL, 0);
+
 			return 1;
 		}
-
-		pid_t pid1, pid2;
-		pid1 = fork();
-
-		if(pid1 == 0){
-			signal(SIGINT, SIG_DFL);
-			signal(SIGTSTP, SIG_DFL);
-
-			
-			close(pipefd[0]);
-			dup2(pipefd[1], STDOUT_FILENO);
-			close(pipefd[1]);
-
-			if(execvp(args[0], args) == -1){
-				perror("tuffshell komut 1");
-				exit(EXIT_FAILURE);
-			}
-		}
-
-		pid2 = fork();
-		if(pid2 == 0){
-			signal(SIGINT, SIG_DFL);
-			signal(SIGTSTP, SIG_DFL);
-
-			close(pipefd[1]);
-			dup2(pipefd[0], STDIN_FILENO);
-			close(pipefd[0]);
-
-			if(execvp(args2[0], args2) == -1){
-				perror("tuffshell komut 2");
-				exit(EXIT_FAILURE);
-			}
-		}
-
-		close(pipefd[0]);
-		close(pipefd[1]);
-
-		waitpid(pid1, NULL, 0);
-		waitpid(pid2, NULL, 0);
-
-		return 1;
+		pipe_index = -1;
 	}
 
 	int is_background = 0;

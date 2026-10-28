@@ -43,6 +43,7 @@ void sigint_handler(int sig){
 void load_start(){
 	char *home = getenv("HOME");
 	if(home == NULL){
+		fprintf(stderr, "Tuffshell couldn't access home variable.");
 		return;
 	}
 	
@@ -54,6 +55,7 @@ void load_start(){
 		file = fopen(config_path, "w");
 		if(file == NULL){
 			fprintf(stderr, "Start file isn't exit and we couldn't create a new one.");
+			fclose(file);
 			return;
 		}
 
