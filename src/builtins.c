@@ -61,7 +61,12 @@ int cd(char **args){
 			}
 
 			if(args[i+1] != NULL){
-				strcat(raw_path, " ");
+				if(strlen(raw_path) + 1 >= 1024){
+					fprintf(stderr, "Arguments for cd command is too long! (>=1000)");
+					return -1;
+				}
+				else
+					strcat(raw_path, " ");
 			}	
 			i++;
 		}
@@ -70,7 +75,7 @@ int cd(char **args){
 			snprintf(path, sizeof(path), "%s%s", home, raw_path + 1);
 		}
 		else{
-			snprintf(path, sizeof(path), raw_path);
+			snprintf(path, sizeof(path), "%s", raw_path);
 		}
 
 		if(chdir(path) != 0){
